@@ -1,6 +1,5 @@
-fastapi
+fastapi[all]
 tensorflow
 numpy
 scipy
 pydantic
-uvicorn

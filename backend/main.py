@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import tensorflow as tf
 import numpy as np
@@ -21,6 +22,19 @@ HIGHCUT = 45.0
 
 # --- FastAPI App Initialization ---
 app = FastAPI(title="ECG Arrhythmia Diagnosis API")
+
+# --- CORS Middleware ---
+# This allows the web frontend (running on a different origin) to communicate with the API.
+origins = ["*"]  # Allow all origins for simplicity in this project
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 model = None
 
 # --- Pydantic Models for Request and Response ---

@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Arrhythmia Diagnosis</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Including Chart.js from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>ECG Arrhythmia Analysis</h1>
+        <p>A web-based tool for ECG signal classification and information.</p>
+    </header>
+    <main>
+        <!-- ECG Analysis Section -->
+        <section class="container" id="ecg-analysis-container">
+            <h2>ECG Signal Analysis</h2>
+            <div class="card">
+                <canvas id="ecgChart"></canvas>
+            </div>
+            <div class="card" id="results-card">
+                <h3>Diagnosis Results</h3>
+                <p><strong>Arrhythmia Type:</strong> <span id="arrhythmia-type">N/A</span></p>
+                <p><strong>Confidence:</strong> <span id="confidence">N/A</span></p>
+                <button id="analyze-button">Analyze New Signal</button>
+            </div>
+        </section>
+
+        <!-- Chatbot Section -->
+        <section class="container" id="chatbot-container">
+            <h2>Arrhythmia Information Chatbot</h2>
+            <div class="card">
+                <div id="chat-history">
+                    <div class="bot-message">Hello! Ask me about an arrhythmia type.</div>
+                </div>
+                <div id="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Type your message...">
+                    <button id="chat-send-button">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>ECG Analysis & AR Visualization Project</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>

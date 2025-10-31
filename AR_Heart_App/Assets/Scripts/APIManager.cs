@@ -25,15 +25,31 @@ public class DiagnosisResponse
     public int class_id;
 }
 
+[System.Serializable]
+public class ChatRequest
+{
+    public string message;
+}
+
+[System.Serializable]
+public class ChatResponse
+{
+    public string reply;
+}
+
+
 /// <summary>
 /// Manages API calls to the ECG diagnosis backend.
 /// </summary>
 public class APIManager : MonoBehaviour
 {
-    // The URL of the FastAPI backend.
+    // The base URL of the FastAPI backend.
     // Use http://10.0.2.2:8000 for Android Emulator to connect to localhost.
     // Use http://localhost:8000 or http://127.0.0.1:8000 for Unity Editor.
-    private const string apiURL = "http://127.0.0.1:8000/predict";
+    private const string baseURL = "http://127.0.0.1:8000";
+    private const string predictEndpoint = "/predict";
+    private const string chatEndpoint = "/chat";
+
 
     /// <summary>
     /// Sends ECG data to the backend and retrieves the diagnosis.
@@ -42,18 +58,20 @@ public class APIManager : MonoBehaviour
     /// <param name="callback">Action to be executed upon receiving a response.</param>
     public IEnumerator GetDiagnosis(List<float> signalData, System.Action<DiagnosisResponse> callback)
     {
+        string url = baseURL + predictEndpoint;
+
         // 1. Create the request object
         EcgRequest requestData = new EcgRequest { signal = signalData };
         string jsonData = JsonUtility.ToJson(requestData);
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
 
         // 2. Create the UnityWebRequest
-        UnityWebRequest request = new UnityWebRequest(apiURL, "POST");
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
-        Debug.Log("Sending request to " + apiURL);
+        Debug.Log("Sending request to " + url);
 
         // 3. Send the request and wait for a response
         yield return request.SendWebRequest();
@@ -76,6 +94,53 @@ public class APIManager : MonoBehaviour
             catch (System.Exception ex)
             {
                 Debug.LogError("JSON Deserialization Error: " + ex.Message);
+                callback?.Invoke(null);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sends a message to the chatbot backend and retrieves the reply.
+    /// </summary>
+    /// <param name="message">The user's message string.</param>
+    /// <param name="callback">Action to be executed upon receiving a response.</param>
+    public IEnumerator GetChatbotResponse(string message, System.Action<ChatResponse> callback)
+    {
+        string url = baseURL + chatEndpoint;
+
+        // 1. Create the request object
+        ChatRequest requestData = new ChatRequest { message = message };
+        string jsonData = JsonUtility.ToJson(requestData);
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+
+        // 2. Create the UnityWebRequest
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        Debug.Log("Sending chat message to " + url);
+
+        // 3. Send the request
+        yield return request.SendWebRequest();
+
+        // 4. Handle the response
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Chat Error: " + request.error);
+            callback?.Invoke(null);
+        }
+        else
+        {
+            Debug.Log("Chat response: " + request.downloadHandler.text);
+            try
+            {
+                ChatResponse response = JsonUtility.FromJson<ChatResponse>(request.downloadHandler.text);
+                callback?.Invoke(response);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Chat JSON Deserialization Error: " + ex.Message);
                 callback?.Invoke(null);
             }
         }

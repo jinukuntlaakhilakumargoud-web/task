@@ -59,4 +59,19 @@ These instructions guide you through setting up the Unity project, specifically 
 - In the `ARController` component on `AppManager`, drag your `HeartPrefab` from `Assets` into the "Heart Prefab" field.
 - Create a UI Button (`GameObject > UI > Button`) and drag it into the "Diagnosis Button" field in the `ARController`.
 
-Your Unity project is now set up! When you run the app on an AR-capable device, you can tap to place the heart, and then press the button to trigger the diagnosis and animation.
+## 7. Chatbot UI Setup
+- Create a new UI Button (`GameObject > UI > Button`) for toggling the chat. Name it `ChatButton`. Drag it into the "Chat Button" field in the `ARController`.
+- Create a UI Panel (`GameObject > UI > Panel`) to serve as the chat window. Name it `ChatPanel`. Drag this into the "Chat Panel" field in the `ARController`.
+- Attach the `ChatManager.cs` script to the `ChatPanel` GameObject.
+- Inside the `ChatPanel`, create the following UI elements:
+  - A **Scroll View** (`GameObject > UI > Scroll View`) for the chat history.
+  - An **Input Field** (`GameObject > UI > Input Field`) for user messages.
+  - A **Button** (`GameObject > UI > Button`) for sending messages.
+- Configure the `ChatManager` component on the `ChatPanel`:
+  - Drag the **Input Field** to the `Chat Input Field`.
+  - Drag the **Send Button** to the `Send Button`.
+  - Drag the **Scroll View** to the `Chat Scroll Rect`.
+  - Drag the `AppManager` GameObject (which has the `APIManager` script) to the `Api Manager` field.
+  - The `Chat History Text` needs a `Text` component. You can find one as a child of the `Scroll View`'s `Content` object. Drag this `Text` object into the `Chat History Text` field.
+
+Your Unity project is now set up! When you run the app on an AR-capable device, you can tap to place the heart, and then press the buttons to trigger the diagnosis and animation, or to open the chat window.

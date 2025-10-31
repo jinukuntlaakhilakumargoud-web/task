@@ -32,6 +32,12 @@ class DiagnosisResponse(BaseModel):
     confidence: float
     class_id: int
 
+class ChatRequest(BaseModel):
+    message: str
+
+class ChatResponse(BaseModel):
+    reply: str
+
 # --- Preprocessing Functions ---
 def butter_lowpass_filter(data, cutoff, fs, order=5):
     """Applies a Butterworth low-pass filter to the data."""
@@ -118,6 +124,43 @@ def predict(request: EcgRequest):
         confidence=confidence,
         class_id=int(predicted_class_id)
     )
+
+# --- Chatbot Logic ---
+CHATBOT_RESPONSES = {
+    "normal": "A 'Normal' heartbeat, or Normal Sinus Rhythm, means the heart's electrical impulse originates from the sinus node and follows a normal pathway, resulting in a regular rhythm and rate (usually 60-100 bpm).",
+    "supraventricular ectopic": "'Supraventricular Ectopic' (SVE) beat is a premature heartbeat originating above the ventricles, often in the atria. It can feel like a skipped beat or flutter and is usually benign.",
+    "ventricular ectopic": "'Ventricular Ectopic' (VE) beat is a premature heartbeat originating from within the ventricles. It feels like a skipped or forceful beat. Occasional VEs are common, but frequent ones may indicate underlying issues.",
+    "fusion": "A 'Fusion' beat occurs when a supraventricular and a ventricular impulse coincide to produce a hybrid beat. It's often seen in the context of ventricular arrhythmias.",
+    "unknown": "An 'Unknown' beat is a heartbeat that could not be confidently classified into one of the other categories by the model. This may require further analysis by a medical professional.",
+    "hello": "Hello! I am an arrhythmia information bot. Ask me about a type of heartbeat (e.g., 'What is a Normal beat?') to learn more.",
+    "default": "I can provide information on the following arrhythmia types: Normal, Supraventricular Ectopic, Ventricular Ectopic, and Fusion. Please ask me about one of them."
+}
+
+def get_chatbot_response(message: str) -> str:
+    """Simple rule-based logic for the chatbot."""
+    message_lower = message.lower()
+    if "normal" in message_lower:
+        return CHATBOT_RESPONSES["normal"]
+    if "supraventricular" in message_lower:
+        return CHATBOT_RESPONSES["supraventricular ectopic"]
+    if "ventricular" in message_lower:
+        return CHATBOT_RESPONSES["ventricular ectopic"]
+    if "fusion" in message_lower:
+        return CHATBOT_RESPONSES["fusion"]
+    if "unknown" in message_lower:
+        return CHATBOT_RESPONSES["unknown"]
+    if "hello" in message_lower or "hi" in message_lower:
+        return CHATBOT_RESPONSES["hello"]
+    return CHATBOT_RESPONSES["default"]
+
+@app.post("/chat", response_model=ChatResponse, summary="Get Chatbot Response")
+def chat(request: ChatRequest):
+    """
+    Accepts a user message and returns a predefined chatbot response.
+    """
+    reply = get_chatbot_response(request.message)
+    return ChatResponse(reply=reply)
+
 
 if __name__ == "__main__":
     import uvicorn

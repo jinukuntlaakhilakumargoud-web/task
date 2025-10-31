@@ -22,6 +22,10 @@ public class ARController : MonoBehaviour
     [Header("UI")]
     [SerializeField]
     private Button diagnosisButton;
+    [SerializeField]
+    private Button chatButton;
+    [SerializeField]
+    private GameObject chatPanel;
 
     [Header("Managers")]
     [SerializeField]
@@ -47,6 +51,17 @@ public class ARController : MonoBehaviour
         {
             diagnosisButton.onClick.AddListener(OnDiagnoseButtonPressed);
             diagnosisButton.gameObject.SetActive(false); // Initially hidden
+        }
+
+        if (chatButton != null)
+        {
+            chatButton.onClick.AddListener(OnChatButtonPressed);
+            chatButton.gameObject.SetActive(false); // Initially hidden
+        }
+
+        if (chatPanel != null)
+        {
+            chatPanel.SetActive(false); // Ensure chat is hidden on start
         }
     }
 
@@ -79,12 +94,29 @@ public class ARController : MonoBehaviour
                 return;
             }
 
-            // Activate the UI button
+            // Activate the UI buttons
             if (diagnosisButton != null)
             {
                 diagnosisButton.gameObject.SetActive(true);
-                Debug.Log("Heart placed. Diagnosis button activated.");
             }
+            if (chatButton != null)
+            {
+                chatButton.gameObject.SetActive(true);
+            }
+            Debug.Log("Heart placed. UI buttons activated.");
+        }
+    }
+
+    /// <summary>
+    /// Toggles the visibility of the chatbot panel.
+    /// </summary>
+    public void OnChatButtonPressed()
+    {
+        if (chatPanel != null)
+        {
+            bool isActive = chatPanel.activeSelf;
+            chatPanel.SetActive(!isActive);
+            Debug.Log($"Chat panel toggled to: {!isActive}");
         }
     }
 
